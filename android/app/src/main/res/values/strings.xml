@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Artify</string>
+    <string name="title_activity_main">Artify</string>
+    <string name="package_name">io.github.murtaza335.artify</string>
+    <string name="custom_url_scheme">io.github.murtaza335.artify</string>
+</resources>

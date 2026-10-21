@@ -1,0 +1,33 @@
+/* Artify Tile Night, from scripts/palettes.js (`dark`) in the extension.
+   Every colour in the app comes from here. scripts/check-contrast.mjs checks the text pairs. */
+:root {
+  color-scheme: dark;
+
+  --bg:          #1B1016;  /* page / stage ground (editor bg) */
+  --bg-deep:     #0F0A0E;  /* bars: top bar, bottom nav, rail (titleBg) */
+  --surface:     #241520;  /* sheets, cards, menus (widget) */
+  --teal-deep:   #10232B;  /* secondary surface, active chip ground (sidebar) */
+  --line:        #3A2630;  /* hairlines */
+  --line-strong: #4A3040;
+  --fg:          #F3EBDD;  /* cream text */
+  --fg-muted:    #B9A8AE;
+  --accent:      #E9A93B;  /* ochre: primary action, active tab, focus */
+  --accent-hover:#F2B134;
+  --on-accent:   #1B1016;
+  --link:        #62C3E3;  /* sky */
+  --brick:       #E5534B;  /* destructive only */
+  --hover:       #16303A;
+  --scrim:       #0F0A0ECC; /* behind sheets */
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --tap: 44px;
+  --gutter: 16px;
+  --bar: 52px;
+  --nav: 60px;
+  --rail: 76px;
+  --panel: 300px;
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}

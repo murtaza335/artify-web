@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F0A0E">
+<title>Artify: endless shard art</title>
+<meta name="description" content="Tap for endless generated shard art. Solve it as a puzzle, throw paint, or build your own design. No accounts, no tracking.">
+<meta property="og:title" content="Artify">
+<meta property="og:description" content="Tap for endless generated shard art. Solve it as a puzzle, throw paint, or build your own.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<!-- icons -->
+<div class="app" id="app" data-mode="reform">
+
+  <header class="topbar">
+    <a class="brand" href="#/reform" aria-label="Artify, back to Reform">ARTIFY</a>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+    <button class="icon" id="btn-info" type="button" aria-label="About Artify" data-tip="About"><svg class="i"><use href="#i-info"/></svg></button>
+    <button class="icon" id="btn-more" type="button" aria-label="More options" data-tip="More" aria-haspopup="dialog"><svg class="i"><use href="#i-ellipsis"/></svg></button>
+  </header>
+
+  <nav class="nav" aria-label="Modes">
+    <a class="nav-item" href="#/reform" data-mode="reform"><svg class="i"><use href="#i-sparkles"/></svg><span>Reform</span></a>
+    <a class="nav-item" href="#/puzzle" data-mode="puzzle"><svg class="i"><use href="#i-puzzle"/></svg><span>Puzzle</span></a>
+    <a class="nav-item" href="#/splash" data-mode="splash"><svg class="i"><use href="#i-paintbrush"/></svg><span>Splash</span></a>
+    <a class="nav-item" href="#/studio" data-mode="studio"><svg class="i"><use href="#i-shapes"/></svg><span>Studio</span></a>
+    <a class="nav-item" href="#/saved" data-mode="saved"><svg class="i"><use href="#i-heart"/></svg><span>Saved</span></a>
+    <button class="icon rail-only" id="rail-info" type="button" aria-label="About Artify" data-tip="About"><svg class="i"><use href="#i-info"/></svg></button>
+  </nav>
+
+  <div class="chips" id="chips" role="group" aria-label="Category" data-modes="reform puzzle"></div>
+
+  <main class="stage" id="stage">
+    <button class="art" id="art" type="button" aria-label="Next artwork" data-modes="reform"></button>
+    <div class="board" id="board" data-modes="puzzle"></div>
+    <div class="paint-wrap" id="paint-wrap" data-modes="splash">
+      <canvas id="paint" aria-label="Paint canvas. Drag to splash paint, hold still to pour."></canvas>
+    </div>
+    <div class="studio-wrap" id="studio-wrap" data-modes="studio"></div>
+    <section class="saved" id="saved" data-modes="saved" aria-labelledby="saved-title">
+      <div class="saved-head">
+        <h1 id="saved-title">Saved</h1>
+        <p class="muted">Everything you save stays in this browser.</p>
+      </div>
+      <h2 class="label">Designs</h2>
+      <div class="grid" id="saved-designs"></div>
+      <p class="empty" id="saved-designs-empty">Tap <svg class="i inline"><use href="#i-heart"/></svg> on any artwork to keep it here.</p>
+      <h2 class="label">My Studio designs</h2>
+      <div class="grid" id="saved-creations"></div>
+      <p class="empty" id="saved-creations-empty">Designs you build in Studio show up here, and come up when you reform.</p>
+      <h2 class="label">Paintings</h2>
+      <div class="grid" id="saved-paintings"></div>
+      <p class="empty" id="saved-paintings-empty">Paintings you save in Splash show up here.</p>
+      <h2 class="label">Backup</h2>
+      <p class="muted">Browser storage can be cleared. Keep a copy of everything as a file, and load it back here or on another device.</p>
+      <div class="row">
+        <button class="btn" id="export-all" type="button"><svg class="i"><use href="#i-download"/></svg>Export backup</button>
+        <button class="btn" id="import-all" type="button"><svg class="i"><use href="#i-upload"/></svg>Import backup</button>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+      </div>
+    </section>
+
+    <p class="hint-pill" id="hint" hidden>Tap the art for the next one</p>
+    <div class="win" id="win" hidden>
+      <p id="win-text">Solved!</p>
+      <button class="btn primary" id="win-next" type="button">Next puzzle<svg class="i"><use href="#i-arrow-right"/></svg></button>
+    </div>
+    <button class="icon zen-exit" id="zen-exit" type="button" aria-label="Exit zen mode" data-tip="Exit zen (F)"><svg class="i"><use href="#i-minimize"/></svg></button>
+  </main>
+
+  <!-- One row of tools per mode, under the stage on phones and in the side panel on desktop. -->
+  <div class="tools" id="tools-splash" data-modes="splash" role="group" aria-label="Paint colours"></div>
+  <div class="tools" id="tools-studio" data-modes="studio" role="group" aria-label="Colour of the selected shape"></div>
+
+  <div class="actions" data-modes="reform" role="toolbar" aria-label="Artwork actions">
+    <button class="icon act" id="r-save" type="button" aria-label="Save design" aria-pressed="false" data-tip="Save (S)"><svg class="i"><use href="#i-heart"/></svg></button>
+    <button class="icon act" id="r-share" type="button" aria-label="Share" data-tip="Copy link (C)"><svg class="i"><use href="#i-share-2"/></svg></button>
+    <button class="icon act" id="r-download" type="button" aria-label="Download PNG" data-tip="Download PNG (D)"><svg class="i"><use href="#i-download"/></svg></button>
+    <button class="icon act" id="r-auto" type="button" aria-label="Auto-reform every 5 seconds" aria-pressed="false" data-tip="Auto-reform (A)"><svg class="i"><use href="#i-repeat"/></svg></button>
+  </div>
+  <div class="actions" data-modes="puzzle" role="toolbar" aria-label="Puzzle actions">
+    <button class="icon act" id="p-save" type="button" aria-label="Save design" aria-pressed="false" data-tip="Save (S)"><svg class="i"><use href="#i-heart"/></svg></button>
+    <button class="icon act" id="p-answer" type="button" aria-label="Show answer" data-tip="Show answer"><svg class="i"><use href="#i-eye"/></svg></button>
+    <button class="icon act" id="p-download" type="button" aria-label="Download PNG" data-tip="Download PNG (D)"><svg class="i"><use href="#i-download"/></svg></button>
+    <button class="icon act" id="p-next" type="button" aria-label="New puzzle" data-tip="New puzzle (N)"><svg class="i"><use href="#i-arrow-right"/></svg></button>
+  </div>
+  <div class="actions" data-modes="splash" role="toolbar" aria-label="Painting actions">
+    <button class="icon act" id="s-clear" type="button" aria-label="Clear canvas" data-tip="Clear (C)"><svg class="i"><use href="#i-eraser"/></svg></button>
+    <button class="icon act" id="s-save" type="button" aria-label="Save painting" data-tip="Save painting (S)"><svg class="i"><use href="#i-heart"/></svg></button>
+    <button class="icon act" id="s-share" type="button" aria-label="Share painting" data-tip="Share"><svg class="i"><use href="#i-share-2"/></svg></button>
+    <button class="icon act" id="s-download" type="button" aria-label="Download PNG" data-tip="Download PNG (D)"><svg class="i"><use href="#i-download"/></svg></button>
+  </div>
+  <div class="actions" data-modes="studio" role="toolbar" aria-label="Studio tools">
+    <button class="icon act" id="t-add" type="button" aria-label="Add a shape" data-tip="Add a shape" aria-haspopup="dialog"><svg class="i"><use href="#i-plus"/></svg></button>
+    <button class="icon act" id="t-undo" type="button" aria-label="Undo" data-tip="Undo (Ctrl+Z)"><svg class="i"><use href="#i-undo-2"/></svg></button>
+    <button class="icon act" id="t-dup" type="button" aria-label="Duplicate shape" data-tip="Duplicate (D)"><svg class="i"><use href="#i-copy"/></svg></button>
+    <button class="icon act" id="t-flip" type="button" aria-label="Flip shape" data-tip="Flip"><svg class="i"><use href="#i-flip-horizontal-2"/></svg></button>
+    <button class="icon act danger" id="t-del" type="button" aria-label="Delete shape" data-tip="Delete (Del)"><svg class="i"><use href="#i-trash-2"/></svg></button>
+    <button class="icon act" id="t-save" type="button" aria-label="Save design" data-tip="Save design"><svg class="i"><use href="#i-check"/></svg></button>
+  </div>
+
+  <!-- Studio's shape picker: a bottom sheet on phones, docked in the side panel on desktop. -->
+  <dialog class="sheet dockable" id="sheet-shapes" aria-labelledby="shapes-title" data-modes="studio">
+    <div class="sheet-head">
+      <h2 class="label" id="shapes-title">Add a shape</h2>
+      <button class="icon sheet-close" type="button" aria-label="Close" data-tip="Close"><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="picker" id="picker" role="group" aria-label="Shapes"></div>
+  </dialog>
+
+  <!-- Options for the current mode: the ⋯ sheet on phones, the lower side panel on desktop. -->
+  <dialog class="sheet dockable" id="sheet-more" aria-labelledby="more-title">
+    <div class="sheet-head">
+      <h2 class="label" id="more-title">Options</h2>
+      <button class="icon sheet-close" type="button" aria-label="Close" data-tip="Close"><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+
+    <div class="opts" data-modes="reform">
+      <button class="row-btn" id="r-svg" type="button"><svg class="i"><use href="#i-image"/></svg>Download SVG</button>
+      <button class="row-btn" id="r-zen" type="button"><svg class="i"><use href="#i-maximize"/></svg>Zen mode<span class="kbd">F</span></button>
+      <button class="row-btn" id="r-round" type="button"><svg class="i"><use href="#i-repeat"/></svg>Start a new round</button>
+      <p class="muted small">Nothing repeats until you have seen everything in a category. Then a new round begins.</p>
+      <dl class="keys desktop-only">
+        <dt>Space, →, R</dt><dd>Next</dd>
+        <dt>←</dt><dd>Previous</dd>
+        <dt>S</dt><dd>Save</dd>
+        <dt>C</dt><dd>Copy link</dd>
+        <dt>D</dt><dd>Download</dd>
+        <dt>A</dt><dd>Auto-reform</dd>
+        <dt>F</dt><dd>Zen mode</dd>
+      </dl>
+    </div>
+
+    <div class="opts" data-modes="puzzle">
+      <label class="switch"><input type="checkbox" id="p-guide" checked><span>Show a faint guide</span></label>
+      <button class="row-btn" id="p-answer-2" type="button"><svg class="i"><use href="#i-eye"/></svg>Show answer</button>
+      <button class="row-btn" id="p-svg" type="button"><svg class="i"><use href="#i-image"/></svg>Download SVG</button>
+      <p class="muted small">Drag each shard to where it belongs. Pieces snap into place when they are close.</p>
+      <dl class="keys desktop-only"><dt>N</dt><dd>New puzzle</dd><dt>S</dt><dd>Save</dd></dl>
+    </div>
+
+    <div class="opts" data-modes="splash">
+      <label class="range"><span>Brush size</span><input type="range" id="s-size" min="8" max="60" value="26"></label>
+      <p class="muted small">Drag to splash paint. Hold still to pour a puddle, and watch the drips run.</p>
+      <dl class="keys desktop-only"><dt>1–8</dt><dd>Pick a colour</dd><dt>C</dt><dd>Clear</dd><dt>S</dt><dd>Save</dd></dl>
+    </div>
+
+    <div class="opts" data-modes="studio">
+      <label class="field"><span>Name</span><input type="text" id="t-name" maxlength="60" value="My design" autocomplete="off"></label>
+      <h3 class="label">Background</h3>
+      <div class="swatches" id="t-bg" role="group" aria-label="Canvas background"></div>
+      <div class="row">
+        <button class="btn" id="t-forward" type="button"><svg class="i"><use href="#i-bring-to-front"/></svg>Forward</button>
+        <button class="btn" id="t-back" type="button"><svg class="i"><use href="#i-send-to-back"/></svg>Back</button>
+      </div>
+      <button class="row-btn" id="t-new" type="button"><svg class="i"><use href="#i-plus"/></svg>New design</button>
+      <button class="row-btn" id="t-svg" type="button"><svg class="i"><use href="#i-image"/></svg>Download SVG</button>
+      <button class="row-btn" id="t-png" type="button"><svg class="i"><use href="#i-download"/></svg>Download PNG</button>
+      <p class="muted small">Drag a shape to move it. Drag the round handles, or pinch with two fingers, to resize and rotate. Saved designs come up when you reform.</p>
+      <dl class="keys desktop-only"><dt>Arrows</dt><dd>Move</dd><dt>+ −</dt><dd>Resize</dd><dt>[ ]</dt><dd>Rotate</dd><dt>, .</dt><dd>Select next</dd><dt>D</dt><dd>Duplicate</dd><dt>Del</dt><dd>Delete</dd></dl>
+    </div>
+
+    <footer class="links">
+      <button class="row-btn" id="install" type="button" hidden><svg class="i"><use href="#i-download"/></svg>Install Artify on this device</button>
+      <a class="cta" href="https://open-vsx.org/extension/artify/artify" target="_blank" rel="noopener"><svg class="i"><use href="#i-sparkles"/></svg>Get Artify for your editor</a>
+      <a href="https://github.com/murtaza335/artify" target="_blank" rel="noopener"><svg class="i"><use href="#i-code"/></svg>Source on GitHub</a>
+      <a href="https://github.com/murtaza335/artify/issues" target="_blank" rel="noopener"><svg class="i"><use href="#i-bug"/></svg>Report an issue</a>
+    </footer>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-text"></span><button class="toast-action" id="toast-action" type="button" hidden></button></div>
+</div>
+
+<dialog class="sheet about" id="sheet-about" aria-labelledby="about-title">
+  <div class="sheet-head">
+    <h2 class="wordmark" id="about-title">ARTIFY</h2>
+    <button class="icon sheet-close" type="button" aria-label="Close" data-tip="Close"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <p>Endless shard art. Every tap breaks one picture apart and builds something new from the pieces. Solve it as a puzzle, throw paint, or build your own design.</p>
+  <a class="btn primary wide" href="https://open-vsx.org/extension/artify/artify" target="_blank" rel="noopener"><svg class="i"><use href="#i-sparkles"/></svg>Get Artify for your editor<svg class="i"><use href="#i-external-link"/></svg></a>
+  <p class="muted small">The same art lives in the Artify extension for VSCodium, Cursor, Windsurf and other editors that use Open VSX, along with two colour themes.</p>
+  <ul class="link-list">
+    <li><a href="https://github.com/murtaza335/artify" target="_blank" rel="noopener"><svg class="i"><use href="#i-code"/></svg>Source on GitHub</a></li>
+    <li><a href="https://github.com/murtaza335/artify/issues" target="_blank" rel="noopener"><svg class="i"><use href="#i-bug"/></svg>Report an issue</a></li>
+    <li><a href="https://github.com/murtaza335/artify#themes" target="_blank" rel="noopener"><svg class="i"><use href="#i-paintbrush"/></svg>The colours come from Artify Tile Night</a></li>
+  </ul>
+  <p class="muted small">No accounts, no tracking. Everything you save stays in this browser. MIT licence.</p>
+</dialog>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

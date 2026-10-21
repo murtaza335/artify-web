@@ -1,0 +1,9 @@
+{
+  "appId": "io.github.murtaza335.artify",
+  "appName": "Artify",
+  "webDir": "dist",
+  "backgroundColor": "#1B1016",
+  "android": {
+    "backgroundColor": "#1B1016"
+  }
+}

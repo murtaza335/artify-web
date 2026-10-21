@@ -1,0 +1,158 @@
+/* Base elements and shared components. Colours come only from tokens.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { margin: 0; height: 100%; background: var(--bg); }
+body {
+  color: var(--fg);
+  font: 15px/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+h1, h2, h3, p { margin: 0; }
+a { color: var(--link); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .4; cursor: not-allowed; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.i { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; }
+.i.inline { width: 1.1em; height: 1.1em; vertical-align: -.2em; }
+.muted { color: var(--fg-muted); }
+.small { font-size: 13px; line-height: 1.5; }
+.label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-muted); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Icon-only buttons: always at least 44 x 44. */
+.icon {
+  display: inline-grid; place-items: center;
+  min-width: var(--tap); min-height: var(--tap); padding: 0;
+  background: transparent; border: 0; border-radius: 50%;
+  color: var(--fg);
+  transition: background-color .15s, color .15s, transform .1s;
+}
+.icon:active { transform: scale(.94); }
+@media (hover: hover) { .icon:hover { background: var(--hover); } }
+
+/* The floating action row's buttons. */
+.act { width: 52px; height: 52px; background: var(--surface); border: 1px solid var(--line); }
+.act[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.act[aria-pressed="true"] .i { fill: currentColor; }
+#r-auto[aria-pressed="true"] .i { fill: none; }
+.act.danger { color: var(--brick); }
+.act.bump { animation: bump .35s var(--ease); }
+@keyframes bump { 40% { transform: scale(1.18); } }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--tap); padding: 0 16px;
+  background: transparent; color: var(--fg);
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  font-weight: 600; text-decoration: none;
+}
+.btn .i { width: 20px; height: 20px; }
+@media (hover: hover) { .btn:hover { background: var(--hover); } }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+@media (hover: hover) { .btn.primary:hover { background: var(--accent-hover); } }
+.btn.wide { width: 100%; }
+
+.row-btn {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  min-height: var(--tap); padding: 0 8px;
+  background: transparent; border: 0; border-radius: var(--radius-sm);
+  text-align: left; font-weight: 500;
+}
+.row-btn .i { width: 20px; height: 20px; color: var(--fg-muted); }
+@media (hover: hover) { .row-btn:hover { background: var(--hover); } }
+.kbd { margin-left: auto; padding: 1px 7px; font-size: 12px; color: var(--fg-muted); border: 1px solid var(--line-strong); border-radius: 6px; }
+
+/* Category chips. The pill is 36 px tall but its hit area is 44. */
+.chip {
+  position: relative; flex: none;
+  height: 36px; padding: 0 14px;
+  background: transparent; color: var(--fg);
+  border: 1px solid var(--line-strong); border-radius: 999px;
+  font-size: 14px; font-weight: 500; white-space: nowrap;
+}
+.chip::after { content: ""; position: absolute; inset: -4px 0; }
+.chip[aria-pressed="true"] { background: var(--teal-deep); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+@media (hover: hover) { .chip:hover { background: var(--hover); } }
+
+/* Colour swatches. The dot is drawn inside a 44 px button. */
+.swatch { display: grid; place-items: center; width: var(--tap); height: var(--tap); padding: 0; background: transparent; border: 0; border-radius: 50%; }
+.swatch .dot { width: 30px; height: 30px; border-radius: 50%; outline: 1px solid var(--line-strong); outline-offset: -1px; transition: transform .12s; }
+.swatch[aria-pressed="true"] .dot { outline: 2px solid var(--fg); outline-offset: 3px; transform: scale(1.08); }
+.swatch.none .dot { display: grid; place-items: center; background: transparent; border: 1px dashed var(--fg-muted); outline: 0; color: var(--fg-muted); }
+.swatch.none[aria-pressed="true"] .dot { outline: 2px solid var(--fg); }
+.swatches { display: flex; flex-wrap: wrap; }
+
+.switch { display: flex; align-items: center; gap: 12px; min-height: var(--tap); padding: 0 8px; cursor: pointer; }
+.switch input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.range, .field { display: flex; flex-direction: column; gap: 6px; padding: 4px 8px; }
+.range input { width: 100%; height: var(--tap); margin: 0; accent-color: var(--accent); }
+.field input {
+  width: 100%; height: var(--tap); padding: 0 12px;
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+}
+
+.keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 8px 0 0; padding: 0 8px; font-size: 13px; }
+.keys dt { color: var(--fg); font-weight: 600; }
+.keys dd { margin: 0; color: var(--fg-muted); }
+
+/* Sheets. On phones they rise from the bottom; see layout.css for docking on desktop. */
+dialog.sheet {
+  width: 100%; max-width: 100%; max-height: 85dvh;
+  margin: auto 0 0; padding: 8px var(--gutter) calc(16px + env(safe-area-inset-bottom));
+  overflow: auto; overscroll-behavior: contain;
+  background: var(--surface); color: var(--fg);
+  border: 0; border-top: 1px solid var(--line); border-radius: var(--radius) var(--radius) 0 0;
+}
+dialog.sheet[open] { animation: rise .22s var(--ease); }
+dialog.sheet::backdrop { background: var(--scrim); }
+@keyframes rise { from { transform: translateY(40px); opacity: 0; } }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-bottom: 4px; }
+.opts { display: flex; flex-direction: column; gap: 2px; }
+.opts .muted.small { padding: 8px; }
+.opts h3.label { padding: 12px 8px 4px; }
+.opts .row { padding: 8px; }
+
+.about p { margin: 0 0 14px; }
+.about .btn.primary { margin: 4px 0 10px; }
+.wordmark, .brand { font-weight: 900; letter-spacing: .32em; font-size: 15px; color: var(--fg); text-decoration: none; }
+.link-list { list-style: none; margin: 6px 0 14px; padding: 0; }
+.link-list a, .links a {
+  display: flex; align-items: center; gap: 12px; min-height: var(--tap); padding: 0 8px;
+  border-radius: var(--radius-sm); text-decoration: none;
+}
+.link-list .i, .links .i { width: 20px; height: 20px; }
+@media (hover: hover) { .link-list a:hover, .links a:hover { background: var(--hover); } }
+.links { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 14px; }
+.links .cta { color: var(--accent); font-weight: 600; }
+
+.toast {
+  position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
+  /* At the top on phones, so it never covers the action row, the hint or a solved puzzle's card. */
+  top: calc(env(safe-area-inset-top) + var(--bar) + 8px);
+  display: flex; align-items: center; gap: 12px;
+  width: max-content; max-width: min(420px, calc(100vw - 2 * var(--gutter))); min-height: 44px; padding: 4px 6px 4px 16px;
+  background: var(--fg); color: var(--on-accent); border-radius: 22px;
+  line-height: 1.35;
+  font-size: 14px; font-weight: 500; box-shadow: 0 6px 24px var(--scrim);
+  animation: toast-in .2s var(--ease);
+}
+.toast:not(:has(.toast-action:not([hidden]))) { padding-right: 16px; }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, -8px); } }
+.toast-action { flex: none; min-height: 36px; padding: 0 14px; background: var(--bg); color: var(--accent); border: 0; border-radius: 999px; font-weight: 700; }
+
+.tip {
+  position: fixed; z-index: 40; pointer-events: none;
+  padding: 5px 9px; background: var(--fg); color: var(--on-accent);
+  border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0s !important; }
+  dialog.sheet[open], .toast, .act.bump { animation: none; }
+}
