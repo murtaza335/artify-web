@@ -2,7 +2,7 @@
 
 > Copy of `../artify/PATTERNS_PLAN.md`. The extension repo holds the original, so edit it there and copy it back here. Section 11 covers the work in this repo.
 
-A plan for adding a large new set of Reform forms to Artify: geometric tilings, mathematical art, world pattern traditions and more abstract movements. It covers 312 forms in twelve families of 26. This is a plan only, and no code has been changed yet.
+A plan for adding a large new set of Reform forms to Artify: geometric tilings, mathematical art, world pattern traditions and more abstract movements. It covers 312 forms in twelve families of 26. **Status: implemented in 0.13.0.** See "Implementation notes" at the end for what changed from this plan.
 
 It builds on [SHAPES_PLAN.md](../artify/SHAPES_PLAN.md), whose ground rules still apply, and on the Abstract round (0.12.0), whose conventions it follows: `abstract-kit.js`, framed panels, `hues()` and puzzle-sized bundles.
 
@@ -84,8 +84,8 @@ Each table gives the function name, the display name returned, what inspired it,
 | `dodecagonTiling` | dodecagons and triangles | Archimedean 3.12.12 | Large dodecagons with triangle gaps. Seed varies the inner star motif. |
 | `pinwheelTiling` | pinwheel tiling | Conway–Radin | Subdivides a 1:2 right triangle 2–4 times. Seed varies depth, colour by level or orientation, and the crop. |
 | `ammannBeenker` | eight-fold tiling | Ammann–Beenker | Rhomb and square substitution from an octagon seed. Seed varies depth, centre and palette rotation. |
-| `penroseKites` | kites and darts | Penrose P2 | Robinson triangles deflated into kites and darts, unlike `penrose`, which uses rhombs. Seed varies the sun or star start and colour by tile type. |
-| `hatMonotile` | einstein tile | 2023 "hat" aperiodic monotile | A precomputed patch of hat polygons with the reflected tiles highlighted. Seed varies the patch window, rotation and palette. |
+| `robinsonTriangles` | robinson triangles | Penrose P2 | Robinson triangles deflated into kites and darts, unlike `penrose`, which uses rhombs. Seed varies the sun or star start and colour by tile type. |
+| `tumblingBlocks` | tumbling blocks | Rhombille (cube) tiling | Hexagons split into three rhombs, coloured as isometric cubes. Seed varies scale and which cubes turn over. |
 | `basketweave` | basketweave paving | Brick paving | Pairs of bricks alternating in direction. Seed varies the number of bricks per pair, mortar colour and tilt. |
 | `pythagoreanTiling` | two-square tiling | Pythagorean tiling | Interlocking large and small squares. Seed varies the size ratio and rotation. |
 | `kiteTiling` | kite tiling | Deltoidal trihexagonal (dual of 3.4.6.4) | Kites meeting at sixfold points. Seed varies colour by orientation and scale. |
@@ -129,7 +129,7 @@ Each table gives the function name, the display name returned, what inspired it,
 | `newtonBasins` | newton basins | Newton fractal | Root basins of z³ − 1 or z⁴ − 1, grouped into cells. Seed varies the polynomial and zoom. |
 | `torusKnot` | torus knot | (p, q) torus knots | A ribbon with over-under gaps. Seed varies (p, q), width and stripe. |
 | `platonicSolids` | platonic solid | The five Platonic solids | A projected solid with shaded faces. Seed varies the solid, rotation and wireframe overlay. |
-| `penroseStairs` | endless stairs | Penrose stairs | An impossible looping staircase in flat shades. Seed varies the step count and palette. |
+| `stairRing` | stair ring | Stair rings | A square staircase ring in isometric blocks that climbs and then descends. Seed varies the step count, rise and palette. |
 | `pascalMod` | pascal's triangle | Pascal's triangle mod p | Hex cells coloured by C(n, k) mod p. Seed varies p (2–7) and the number of rows. |
 
 ### 5.3 Islamic and Persian geometry: `src/shapes/pattern-islamic.js` → `patterns`
@@ -588,3 +588,27 @@ Artify Web (`/home/murtazabaig/fun-projects/artify-web`) imports the engine and 
 - [Textile designs around the world: Matador](https://matadornetwork.com/read/9-textile-designs-around-world/)
 - [Global textiles: Kid World Citizen](https://kidworldcitizen.org/global-textiles-for-kids/)
 - [George Bain, *Celtic Art: The Methods of Construction*](https://www.betterworldbooks.com/product/detail/celtic-art-the-methods-of-construction-9780486229232)
+
+## Implementation notes
+
+All twelve families are in the code, registered in `src/forms.js`, covered by `npm test` and listed in `scripts/shipped-forms.json`. Files: `geometry-tilings.js`, `geometry-math.js`, `pattern-islamic.js`, `pattern-asia.js`, `pattern-textiles.js`, `pattern-ornament.js`, `abstract-kinetic.js`, `abstract-concrete.js`, `abstract-systems.js`, `abstract-decorative.js`, `abstract-growth.js` and `abstract-global.js`, with shared helpers in `pattern-kit.js` and the exact tilings in `tiling-base.js`.
+
+**Names changed from the plan.** Three forms were renamed before shipping, because the first idea turned out not to be drawable faithfully:
+
+| Planned | Shipped | Why |
+|---|---|---|
+| `penroseKites` | `robinsonTriangles` | The triangle deflation reliably gives Penrose rhombs and Robinson triangles, but pairing the same triangles into kites and darts does not tile. The form shows the triangles themselves, coloured by type. |
+| `hatMonotile` | `tumblingBlocks` | The hat polygon and its meta-tile substitution could not be reproduced exactly, and a wrong hat would be misleading. The rhombille cube tiling takes its place. |
+| `penroseStairs` | `stairRing` | A flat staircase cannot close into an impossible loop without trickery, so the form is a stair ring that climbs and then descends. |
+
+**Where the implementation simplifies the plan.**
+
+- `reactionDiffusion` and `turingStripes` use a sum of plane waves of one wavelength, which gives Turing-like spots, stripes and labyrinths at a fraction of the cost of a Gray–Scott run. `slimeMould`, `snowflakeAutomaton`, `lichenGrowth`, `sandpile`, `langtonAnt`, `dlaCluster`, `differentialGrowth`, `spaceColonization`, `flockTrails` and `orbitTrails` are real simulations on small grids.
+- `waveCollapse` fills the grid row by row against the tiles already placed. It always finishes, so it never needs to backtrack.
+- `delaunayMesh` is a jittered grid with random diagonals, not a true triangulation.
+- `lloydCells`, `mudCracks` and `fourColorMap` build their cells by half-plane clipping, and the four-colour map is coloured greedily from five colours.
+- `hyperbolicDisc` reflects a regular polygon through its edge circles, to a few rings from the centre.
+- `kikkoHexes`, `crestRings` and similar forms use invented motifs and never copy real crests or named symbols.
+- Helpers `lattice` and `substitute` became the cached tilings in `tiling-base.js` and a few direct recursions in the forms. `pattern-kit.js` has its own `smoothPath(points, closed)`; the private copy in `faces.js` is left as it was.
+- The time budget is a check on every new form: the median draw must be 8 ms or less and the 95th percentile 40 ms or less.
+- The deck now remembers 6000 recent seeds instead of 2000, so several full rounds still never reuse a seed.

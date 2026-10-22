@@ -65,6 +65,24 @@ test('categories change what is dealt', async ({ page }) => {
   await expect(page).toHaveURL(/#\/art\/space\//);
 });
 
+test('the Patterns category deals its own artwork and reforms without errors', async ({ page, isMobile }) => {
+  await page.goto('/');
+  await ready(page);
+  await page.locator('.chip[data-category="patterns"]').scrollIntoViewIfNeeded();
+  await page.locator('.chip[data-category="patterns"]').click();
+  await expect(page).toHaveURL(/#\/art\/patterns\//);
+  const seen = new Set();
+  for (let i = 0; i < 5; i++) {
+    await expect(page.locator('#art svg')).toBeVisible();
+    seen.add(page.url());
+    // Shards fly in for a moment, and a tap during that is ignored.
+    await page.waitForTimeout(1100);
+    await tapArt(page, isMobile);
+    await expect(page).not.toHaveURL(Array.from(seen).pop());
+  }
+  expect(seen.size).toBe(5);
+});
+
 test('puzzle can be solved and moves on', async ({ page }) => {
   await page.goto('/#/puzzle');
   await expect(page.locator('#status')).toContainText('pieces placed');
